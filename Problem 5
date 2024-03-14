@@ -1,0 +1,54 @@
+import random
+
+class VacuumCleaner:
+    def __init__(self):
+        self.location = (random.randint(0, 1), random.randint(0, 1))
+        self.environment = [[random.choice(['clean', 'dirty']) for _ in range(2)] for _ in range(2)]
+        self.performance = 0
+
+    def clean(self):
+        if self.environment[self.location[0]][self.location[1]] == 'dirty':
+            self.performance += 1
+            self.environment[self.location[0]][self.location[1]] = 'clean'
+
+    def move(self, direction):
+        if direction == 'up' and self.location[0] > 0:
+            self.location = (self.location[0] - 1, self.location[1])
+        elif direction == 'down' and self.location[0] < 1:
+            self.location = (self.location[0] + 1, self.location[1])
+        elif direction == 'left' and self.location[1] > 0:
+            self.location = (self.location[0], self.location[1] - 1)
+        elif direction == 'right' and self.location[1] < 1:
+            self.location = (self.location[0], self.location[1] + 1)
+
+    def sense(self):
+        return self.environment[self.location[0]][self.location[1]]
+
+def main():
+    vacuum = VacuumCleaner()
+
+    print("Initial Environment:")
+    for row in vacuum.environment:
+        print(row)
+
+    print("\nStarting location of the vacuum cleaner:", vacuum.location)
+
+    while any('dirty' in row for row in vacuum.environment):
+        dirty_cell = vacuum.sense()
+        print("\nCurrent location:", vacuum.location, "Status:", dirty_cell)
+        vacuum.clean()
+        print("Performance after cleaning:", vacuum.performance)
+        directions = ['up', 'down', 'left', 'right']
+        if dirty_cell == 'dirty':
+            print("Cleaning the current cell.")
+            print("Moving to a new cell...")
+            vacuum.move(random.choice(directions))
+        print("\nNew location of the vacuum cleaner:", vacuum.location)
+        print("Updated Environment:")
+        for row in vacuum.environment:
+            print(row)
+
+    print("\nAll cells are clean now. Cleaning performance:", vacuum.performance)
+
+if __name__ == "__main__":
+    main()
