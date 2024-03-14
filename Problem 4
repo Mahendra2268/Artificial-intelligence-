@@ -1,0 +1,75 @@
+from collections import deque
+
+# Class to represent the state of the problem
+class State:
+    def __init__(self, missionaries, cannibals, boat):
+        self.missionaries = missionaries
+        self.cannibals = cannibals
+        self.boat = boat
+
+    def __eq__(self, other):
+        return self.missionaries == other.missionaries and self.cannibals == other.cannibals and self.boat == other.boat
+
+    def __hash__(self):
+        return hash((self.missionaries, self.cannibals, self.boat))
+
+    def __repr__(self):
+        return f"({self.missionaries}, {self.cannibals}, {self.boat})"
+
+# Function to check if the state is valid
+def is_valid(state):
+    if state.missionaries < 0 or state.cannibals < 0 or state.missionaries > 3 or state.cannibals > 3:
+        return False
+    if state.missionaries < state.cannibals and state.missionaries > 0:
+        return False
+    if 3 - state.missionaries < 3 - state.cannibals and 3 - state.missionaries > 0:
+        return False
+    return True
+
+# Function to get all possible next states
+def get_next_states(state):
+    next_states = []
+    if state.boat == 1:
+        next_states.append(State(state.missionaries, state.cannibals - 1, 0))
+        next_states.append(State(state.missionaries - 1, state.cannibals, 0))
+        next_states.append(State(state.missionaries - 1, state.cannibals - 1, 0))
+        next_states.append(State(state.missionaries - 2, state.cannibals, 0))
+        next_states.append(State(state.missionaries, state.cannibals - 2, 0))
+    else:
+        next_states.append(State(state.missionaries, state.cannibals + 1, 1))
+        next_states.append(State(state.missionaries + 1, state.cannibals, 1))
+        next_states.append(State(state.missionaries + 1, state.cannibals + 1, 1))
+        next_states.append(State(state.missionaries + 2, state.cannibals, 1))
+        next_states.append(State(state.missionaries, state.cannibals + 2, 1))
+    return [state for state in next_states if is_valid(state)]
+
+# Function to solve the problem using breadth-first search
+def missionaries_cannibals_bfs():
+    start_state = State(3, 3, 1)
+    goal_state = State(0, 0, 0)
+    visited = set()
+    queue = deque([(start_state, [])])
+
+    while queue:
+        current_state, path = queue.popleft()
+        if current_state == goal_state:
+            return path + [current_state]
+        if current_state not in visited:
+            visited.add(current_state)
+            for next_state in get_next_states(current_state):
+                queue.append((next_state, path + [current_state]))
+
+    return None
+
+# Function to print the solution path
+def print_solution(solution):
+    if solution:
+        print("Solution found:")
+        for state in solution:
+            print(state)
+    else:
+        print("No solution found")
+
+# Solve the problem
+solution = missionaries_cannibals_bfs()
+print_solution(solution)
